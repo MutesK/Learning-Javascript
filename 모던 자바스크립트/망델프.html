@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>망델브로 집합</title>
+        <script>
+            window.onload = function() {
+                var canvas = document.getElementById("mycanvas");
+                var ctx = canvas.getContext("2d");
+                var width = canvas.width;
+                var height = canvas.height;
+
+                // 중심점 설정하고 그림.
+                var xc = -0.6, yc = 0;
+                draw();
+                
+                // 그리기 버튼을 클릭하면 그리기 시작
+                document.getElementById("button").onclick = draw;
+
+                // Canvas 위에서 마우스로 클릭한 지점을 중심좌표로 설정한다.
+                document.getElementById("mycanvas").onclick = function(event) {
+                    var ix = event.offsetX;
+                    var iy = event.offsetY;
+                    var mag = parseFloat(document.getElementById("magnification").value);
+
+                    xc += (2 * ix / width - 1) / mag;
+                    yc += (2 * iy / height) / mag / width;
+                    draw();
+                }
+
+                // 설정에 따라 그리는 함수
+                function draw()
+                {
+                    // 배율
+                    var mag = document.getElementById("magnification").value;
+
+                    var maxit = document.getElementById("maxit").value;
+
+                    displayCenter(xc, yc);
+
+                    mandelbrot(ctx, xc, yc, mag, maxit);
+                }
+
+                function displayCenter(xc, yc)
+                {
+                    document.getElementById("xc").innerHTML = xc.toFixed(3);
+                    document.getElementById("yc").innerHTML = yc.toFixed(3);
+                }
+
+                function mandelbrot(c, xc, yc, mag, maxit)
+                {
+                    var w = c.canvas.width;
+                    var h = c.canvas.height;
+                    var xmin = xc - 1 / mag;
+                    var xmax = xc + 1 / mag;
+                    var ymin = yc - (xmax - xmin) * h / w / 2;
+                    var ymax = yc + (xmax - xmin) * h / w / 2;
+                    var dx = (xmax - xmin) / w;  // ViewPoint의 X 길이  / 캔버스 Width 사이즈 -> ViewPoint의 픽셀공간 x 사이즈
+                    var dy = (ymax - ymin) / h;  // ViewPoint의 Y 길이  / 캔버스 height 사이즈 -> ViewPoint의 픽셀공간 y 사이즈
+
+                    // 색상 구분용
+                    var color = [];
+                    color[0] = "black";  // 망델브로 집합의 점 색상은 검은색
+                    var L= 255, dL = 255 / maxit;
+
+                    for(var i = maxit; i > 0; i--)
+                    {
+                        color[i] = "rgb(255,"+Math.floor(L)+",255";
+                        L-=dL;
+                    }
+
+                    // X축 방향의 픽셀 검사
+                    for(var i=0; i<w; i++)
+                    {
+                        var x = xmin + i * dx;  // x축 i번째 픽셀
+                        
+                        // Y축 방향의 픽셀을 검사
+                        for(var j=0; j<h; j++)
+                        {
+                            var y = ymin + j *dy;  // y 축 j번째 픽셀
+
+                            var a = x, b = y;  // pixel(i, j)에 대해
+                            var a2 = a*a, b2 = b*b;
+
+                            // 반지름 2 안에 maxit이내면 반복한다. ->  발산한다면 count가 0가 되고 , 255, 0, 255 -> pink
+                            // 여러번 그려져서 검은색이 나옴.
+                            for(var count=maxit; a2+b2<=4 && count; count--)
+                            {
+                                b = 2 * a * b + y;
+                                a = a2 - b2 + x;
+                                a2 = a * a;
+                                b2 = b * b;
+                            }
+
+                            c.fillStyle = color[count];
+                            c.fillRect(i, j, 1, 1);
+                        }
+                    }
+                }
+            };
+        </script>
+        <style>
+            #mycanvas { border: 1px solid gray;}
+            input {margin: 0 10px; width:60px; text-align: center;}
+            div { font-size:small; margin-bottom: 5px;}
+        </style>
+    </head>
+    <body>
+        <canvas id="mycanvas" width="800" height="640"></canvas>
+        <div>중심 좌표(<span id="xc"></span>, <span id="yc"></span>)</div>
+        <div>
+            <label>확대 배율 : <input id="magnification" type="number" value="0.65"></label>
+            <label>최대 반복 횟수: <input id="maxit" type="number" value="60"></label>
+            <input id="button" type="button" value="그리기">
+        </div>
+    </body>
+</html>

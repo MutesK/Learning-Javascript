@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas 기본</title>
+    <script src="./6-6.js"></script>
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById("mycanvas");
+            var ctx = canvas.getContext("2d");
+
+            strokeRoundedRect(ctx, 10, 10, 100, 80, 10);
+            strokeRoundedRect(ctx, 150, 10, 100, 80, 30);
+        };
+    </script>
+</head>
+<body>
+    <canvas id="mycanvas" width="640" height="400"></canvas>
+</body>
+</html>
