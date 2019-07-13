@@ -2,7 +2,7 @@
 function Graph()
 {
     this.nodes = [];
-
+    
     this.start = null;
     this.end = null;
 }

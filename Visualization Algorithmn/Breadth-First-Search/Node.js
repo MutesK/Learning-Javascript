@@ -25,9 +25,11 @@ Node.prototype.show = function()
    fill(0);
 
     if(this.start || this.end)
-        fill(0,255,0);
+        fill(0,0,255);
+    else if(this.searched)
+        fill(255, 0, 0);
     else 
-        fill(150, 0, 150);
+        fill(0, 0, 0);
 
     ellipse(this.x, this.y, 16, 16);
     
